@@ -99,3 +99,31 @@ const weapons = [
         power: 250
     }
 ];
+
+/*
+Milestone 1 - ogni combattente sceglierà casualmente un'arma dalla relativa lista.
+Una volta scelta, un'arma non sarà più disponibile per i successivi combattenti.
+*/
+
+// stabilire un array vuoto che conterrà i guerrueri e l'arma scelta
+const choiceWeapons = []
+
+// inizializzare un ciclo for per estrapolare e inserire ogni guerriero nel nuovo array
+for(let i = 0; i < fighters.length; i++){
+    choiceWeapons.push(fighters[i])
+}
+
+// associare al guerriero una nuova proprietà chiamata "weapon" e corrispondente all'arma scelta presente nel secondo array
+choiceWeapons.forEach(fighter => {
+    const randomIndex = getRandomIndex(weapons); // funzione richiamata per generare un indice casuale per ogni arma
+    fighter.weapon = weapons[randomIndex].name; // inserimento della nuova proprietà "weapon"
+    fighter.power = fighter.power + weapons[randomIndex].power; // incremento del potere con la nuova arma
+    weapons.splice(randomIndex, 1);
+});
+
+console.log(choiceWeapons)
+
+//funzione che permette di generare un numero indice casuale in base alla lunghezza dell'array
+function getRandomIndex(array) {
+    return Math.floor(Math.random() * array.length);
+} 
