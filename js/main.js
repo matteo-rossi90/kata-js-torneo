@@ -105,21 +105,31 @@ Milestone 1 - ogni combattente sceglierà casualmente un'arma dalla relativa lis
 Una volta scelta, un'arma non sarà più disponibile per i successivi combattenti.
 */
 
-// stabilire un array vuoto che conterrà i guerrueri e l'arma scelta
+/*
+Milestone 2 - ogni combattente si sottoporrà ad un allenamento che incrementerà (o forse no) la sua potenza, 
+moltiplicandola per un numero casuale tra 1 e 100.
+*/
+
+// stabilire un array vuoto che conterrà i guerrieri e l'arma scelta
 const armedFighters = []
 
 // inizializzare un ciclo for per estrapolare e inserire ogni guerriero nel nuovo array
 for(let i = 0; i < fighters.length; i++){
-    armedFighters.push(fighters[i])
+    let trainingFighters = fighters[i]
+    armedFighters.push(trainingFighters)
+    console.log(trainingFighters)
 }
 
 // associare al guerriero una nuova proprietà chiamata "weapon" e corrispondente all'arma scelta presente nel secondo array
 armedFighters.forEach(fighter => {
     const randomIndex = getRandomIndex(weapons); // funzione richiamata per generare un indice casuale per ogni arma
-    fighter.weapon = weapons[randomIndex].name; // inserimento della nuova proprietà "weapon"
-    fighter.power = fighter.power + weapons[randomIndex].power; // incremento del potere con la nuova arma
-    weapons.splice(randomIndex, 1);
+    const training = getNumber(1, 99) // genera un numero casuale tra 1 e 100
+    fighter.weapon = weapons[randomIndex]; // inserimento della nuova proprietà "weapon"
+    fighter.training = training // aggiungere il risultato dell'allenamento
+    fighter.power = (fighter.power + weapons[randomIndex].power) * training;  // incremento del potere con la nuova arma e grazie all'allenamento
+    weapons.splice(randomIndex, 1); // rimozione dell'arma una volta associata
 });
+
 
 console.log(armedFighters)
 
@@ -128,6 +138,7 @@ function getRandomIndex(array) {
     return Math.floor(Math.random() * array.length);
 } 
 
-/*
-Milestone 2 - 
-*/
+//funzione che genera un numero random da un minimo a un massimo
+function getNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
