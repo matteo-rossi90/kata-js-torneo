@@ -110,28 +110,34 @@ Milestone 2 - ogni combattente si sottoporrà ad un allenamento che incrementer�
 moltiplicandola per un numero casuale tra 1 e 100.
 */
 
+/*
+Milestone 3 - escludiamo dal torneo chi, dopo l'allenamento non è riuscito a raggiungere una potenza di almeno 2000.
+*/
+
 // stabilire un array vuoto che conterrà i guerrieri e l'arma scelta
 const armedFighters = []
 
-// inizializzare un ciclo for per estrapolare e inserire ogni guerriero nel nuovo array
+// inizializzare un ciclo for per inserire ogni guerriero nel nuovo array
 for(let i = 0; i < fighters.length; i++){
-    let trainingFighters = fighters[i]
-    armedFighters.push(trainingFighters)
-    console.log(trainingFighters)
+    armedFighters.push(fighters[i])
 }
 
 // associare al guerriero una nuova proprietà chiamata "weapon" e corrispondente all'arma scelta presente nel secondo array
 armedFighters.forEach(fighter => {
     const randomIndex = getRandomIndex(weapons); // funzione richiamata per generare un indice casuale per ogni arma
-    const training = getNumber(1, 99) // genera un numero casuale tra 1 e 100
+    const training = getNumber(1, 100) // genera un numero casuale tra 1 e 100
     fighter.weapon = weapons[randomIndex]; // inserimento della nuova proprietà "weapon"
     fighter.training = training // aggiungere il risultato dell'allenamento
-    fighter.power = (fighter.power + weapons[randomIndex].power) * training;  // incremento del potere con la nuova arma e grazie all'allenamento
+    fighter.power = fighter.power * training;  // incremento del potere grazie all'allenamento
     weapons.splice(randomIndex, 1); // rimozione dell'arma una volta associata
 });
 
 
 console.log(armedFighters)
+
+const excluded = armedFighters.filter(f => f.power >= 2000) // includere solo gli eroi che con l'allenamento hanno raggiunto una forza superiore a 2000
+
+console.log(excluded)
 
 //funzione che permette di generare un numero indice casuale in base alla lunghezza dell'array
 function getRandomIndex(array) {
