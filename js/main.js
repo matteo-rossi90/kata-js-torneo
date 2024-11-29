@@ -116,48 +116,50 @@ Milestone 3 - escludiamo dal torneo chi, dopo l'allenamento non è riuscito a ra
 
 /*
 Milestone 4 - i combattimenti si svolgeranno tra un partecipante e il successivo dell'elenco, assicurandosi che ognuno combatta una sola volta. 
-
 In ogni scontro vincerà il combattente con la potenza più alta. In caso di parità vincerà chi "gioca in casa", ossia chi viene prima nell'elenco.
 */
 
-// stabilire un array vuoto che conterrà i guerrieri e l'arma scelta
-const armedFighters = []
-const weaponsList = []
+console.log('Fase 1 - Assegnazione arma')
+// fare una copia degli oggetti originali
+const armedFighters = fighters.map(fighter => ({ ...fighter })); 
+const weaponsList = weapons.slice(); 
 
-// inizializzare un ciclo for per inserire ogni guerriero nel nuovo array
-for(let i = 0; i < fighters.length; i++){
-    armedFighters.push(fighters[i])
-}
-
-for(let i = 0; i < weapons.length; i++){
-    weaponsList.push(weapons[i])
-}
-
-// associare al guerriero una nuova proprietà chiamata "weapon" e corrispondente all'arma scelta presente nel secondo array
+// assegnare le armi ai combattenti
 armedFighters.forEach(fighter => {
-    const randomIndex = getRandomIndex(weaponsList); // funzione richiamata per generare un indice casuale per ogni arma
-    const training = getNumber(1, 100) // genera un numero casuale tra 1 e 100
-    fighter.weapon = weaponsList[randomIndex]; // inserimento della nuova proprietà "weapon"
-    fighter.training = training // aggiungere il risultato dell'allenamento
-    fighter.power = fighter.power * training;  // incremento del potere grazie all'allenamento
-    weaponsList.splice(randomIndex, 1); // rimozione dell'arma una volta associata
+    const randomIndex = getRandomIndex(weaponsList); // creare un indice casuale
+    fighter.weapon = weaponsList[randomIndex]; // assegnare l'arma
+    weaponsList.splice(randomIndex, 1); // rimuovere l'arma dall'elenco
 });
 
-console.log('Armi:', weapons)
-console.log('Armi scelte:', weaponsList)
-console.log('Guerrieri con armi:', armedFighters)
+console.log("Guerrieri armati:", armedFighters);
+
+console.log('Fase 2 - Allenamento')
+
+// allenare i combattenti
+const trainedFighters = armedFighters.map(fighter => {
+    const training = getNumber(1, 100); // genera il numero casuale che corrispone al livello di allenamento
+    return {
+        ...fighter, // copia tutte le proprietà da armedFighters
+        training, // nuova proprietà
+        power: fighter.power * training // aggiorna la potenza in base al valore dell'allenamento
+    };
+});
+
+console.log("Guerrieri allenati:", trainedFighters);
+
+console.log('Fase 3 - Qualificazione: ')
 
 // includere solo gli eroi che con l'allenamento hanno raggiunto una forza superiore a 2000
-let qualified = armedFighters.filter(f => f.power >= 2000)
+let qualified = trainedFighters.filter(f => f.power >= 2000)
 
+//se la lista dei qualificati è un numero dispari, genera un nuovo combattente
 if(qualified.length % 2 === 1){
-    qualified.push({
-        name: 'Robot',
-        power: 4000
-    })
+    qualified.push(createNeutralFighter('Robot', 4000))
 }
 
 console.log('Si qualificano: ', qualified)
+
+console.log('Fase 4 - Combattimento')
 
 //stabilire il successo degli scontri in base alla potenza
 let nextRound = [];
@@ -172,15 +174,26 @@ for(let i = 0; i < qualified.length; i+=2){
             console.log(`Vince il turno: ${result.winner.name}, sconfiggendo ${result.loser.name}`);
             nextRound.push(result.winner);
             console.log(result)
-        } else {
-            console.log(`${fighter1.name} e ${fighter2.name} sono pari!`);
-            nextRound.push(fighter1, fighter2)
         }
+    
     } 
       
 }
-qualified = nextRound;
-console.log(nextRound)
+
+//se la lista dei vincitori è un numero dispari, genera un nuovo combattente
+if(nextRound.length % 2 === 1){
+    nextRound.push(createNeutralFighter('Robot', 4000))
+ }
+
+ console.log('Passano il round:', nextRound)
+
+ console.log('Fase 5 - Premiazione')
+
+ //stabilire i primi tre vincitori in base alla potenza
+ const podium = nextRound.sort((a, b) => b.power - a.power).slice(0, 3)
+
+ console.log('I tre vincitori del torneo sono:', podium)
+
 
 /////////////////// FUNZIONI ///////////////////////////
 
@@ -194,14 +207,34 @@ function getNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+//funzione che permette di stabilire il vincitore in base alla forza 
 function compareFighters(fighter1, fighter2) {
-    if (!fighter1 || !fighter2) return null; 
 
     if (fighter1.power > fighter2.power) {
-        return { winner: fighter1, loser: fighter2, isDraw: false };
+        return { 
+            winner: fighter1, 
+            loser: fighter2 
+        };
     } else if (fighter1.power < fighter2.power) {
-        return { winner: fighter2, loser: fighter1, isDraw: false };
+        return { 
+            winner: fighter2,
+            loser: fighter1 
+        };
     } else {
-        return { winner: null, loser: null, isDraw: true };
+        return { 
+            winner: null, 
+            loser: null, 
+            isDraw: true 
+        };
     }
+}
+
+//funzione che crea un personaggio da inserire
+function createNeutralFighter(name, basePower) {
+    //const training = getNumber(1, 100)
+    return {
+        name,
+        power: basePower,
+        training: 1
+    };
 }
