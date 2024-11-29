@@ -119,6 +119,13 @@ Milestone 4 - i combattimenti si svolgeranno tra un partecipante e il successivo
 In ogni scontro vincerà il combattente con la potenza più alta. In caso di parità vincerà chi "gioca in casa", ossia chi viene prima nell'elenco.
 */
 
+/*
+tra tutti i vincitori degli scontri, saliranno sul podio i 3 combattenti con la potenza più alta, in ordine decrescente.
+
+**Bonus:**
+
+Il torneo non finisce qui! Dopo il primo girone di scontri, non passiamo subito alla premiazione, ma facciamo in modo che i vincitori si scontrino ancora e ancora, finchè non ne resterà solo uno!*/
+
 console.log('Fase 1 - Assegnazione arma')
 // fare una copia degli oggetti originali
 const armedFighters = fighters.map(fighter => ({ ...fighter })); 
@@ -154,7 +161,7 @@ let qualified = trainedFighters.filter(f => f.power >= 2000)
 
 //se la lista dei qualificati è un numero dispari, genera un nuovo combattente
 if(qualified.length % 2 === 1){
-    qualified.push(createNeutralFighter('Robot', 4000))
+    qualified.push(createFighter('Robot', 4000))
 }
 
 console.log('Si qualificano: ', qualified)
@@ -182,7 +189,7 @@ for(let i = 0; i < qualified.length; i+=2){
 
 //se la lista dei vincitori è un numero dispari, genera un nuovo combattente
 if(nextRound.length % 2 === 1){
-    nextRound.push(createNeutralFighter('Robot', 4000))
+    nextRound.push(createFighter('Robot', 4000))
  }
 
  console.log('Passano il round:', nextRound)
@@ -194,6 +201,46 @@ if(nextRound.length % 2 === 1){
 
  console.log('I tre vincitori del torneo sono:', podium)
 
+ console.log('Bonus - Il torneo continua')
+
+ // usare un array per gestire i combattenti del round corrente
+ let currentFighters = nextRound.slice();
+ 
+ while (currentFighters.length > 1) {
+     console.log("Inizio del nuovo round con:", currentFighters);
+ 
+     const nextRoundFighters = [];
+ 
+     // se il numero dei combattenti è dispari, aggiungere un altro combattente
+     if (currentFighters.length % 2 === 1) {
+         currentFighters.push(createFighter('Robot', 4000));
+     }
+ 
+     // combattimenti a coppie
+     for (let i = 0; i < currentFighters.length; i += 2) {
+         const fighter1 = currentFighters[i];
+         const fighter2 = currentFighters[i + 1];
+ 
+         const result = compareFighters(fighter1, fighter2);
+         console.log(
+             `Scontro: ${fighter1.name} (potenza: ${fighter1.power}) vs ${fighter2.name} (potenza: ${fighter2.power})`
+         );
+ 
+         // aggiungere il vincitore al prossimo round
+         if (result.winner) {
+             console.log(`Vince: ${result.winner.name}`);
+             nextRoundFighters.push(result.winner);
+         }
+     }
+ 
+     // aggiornare i combattenti correnti con i vincitori
+     currentFighters = nextRoundFighters;
+ }
+ 
+ // vincitore finale
+ const ultimateWinner = currentFighters[0];
+ console.log(`Il vincitore finale è ${ultimateWinner.name} con una potenza di ${ultimateWinner.power}!`);
+ 
 
 /////////////////// FUNZIONI ///////////////////////////
 
@@ -221,17 +268,16 @@ function compareFighters(fighter1, fighter2) {
             loser: fighter1 
         };
     } else {
+        const winner = Math.random() > 0.5 ? fighter1 : fighter2;
         return { 
-            winner: null, 
-            loser: null, 
-            isDraw: true 
+            winner, loser: winner === fighter1 ? fighter2 : fighter1 
         };
+        
     }
 }
 
 //funzione che crea un personaggio da inserire
-function createNeutralFighter(name, basePower) {
-    //const training = getNumber(1, 100)
+function createFighter(name, basePower) {
     return {
         name,
         power: basePower,
